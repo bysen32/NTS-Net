@@ -46,13 +46,26 @@ class attention_net(nn.Module):
 
     def forward(self, x):
         resnet_out, rpn_feature, feature = self.pretrained_model(x)
-        x_pad = F.pad(x, (self.pad_side, self.pad_side, self.pad_side, self.pad_side), mode='constant', value=0)
+        x_pad = F.pad(
+            x,
+            (self.pad_side, self.pad_side, self.pad_side, self.pad_side),
+            mode="constant",
+            value=0,
+        )
         batch = x.size(0)
         # we will reshape rpn to shape: batch * nb_anchor
         rpn_score = self.proposal_net(rpn_feature.detach())
         all_cdds = [
-            np.concatenate((x.reshape(-1, 1), self.edge_anchors.copy(), np.arange(0, len(x)).reshape(-1, 1)), axis=1)
-            for x in rpn_score.data.cpu().numpy()]
+            np.concatenate(
+                (
+                    x.reshape(-1, 1),
+                    self.edge_anchors.copy(),
+                    np.arange(0, len(x)).reshape(-1, 1),
+                ),
+                axis=1,
+            )
+            for x in rpn_score.data.cpu().numpy()
+        ]
         top_n_cdds = [hard_nms(x, topn=self.topN, iou_thresh=0.25) for x in all_cdds]
         top_n_cdds = np.array(top_n_cdds)
         top_n_index = top_n_cdds[:, :, -1].astype(np.int)
@@ -62,8 +75,12 @@ class attention_net(nn.Module):
         for i in range(batch):
             for j in range(self.topN):
                 [y0, x0, y1, x1] = top_n_cdds[i][j, 1:5].astype(np.int)
-                part_imgs[i:i + 1, j] = F.interpolate(x_pad[i:i + 1, :, y0:y1, x0:x1], size=(224, 224), mode='bilinear',
-                                                      align_corners=True)
+                part_imgs[i : i + 1, j] = F.interpolate(
+                    x_pad[i : i + 1, :, y0:y1, x0:x1],
+                    size=(224, 224),
+                    mode="bilinear",
+                    align_corners=True,
+                )
         part_imgs = part_imgs.view(batch * self.topN, 3, 224, 224)
         _, _, part_features = self.pretrained_model(part_imgs.detach())
         part_feature = part_features.view(batch, self.topN, -1)
