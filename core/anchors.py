@@ -39,17 +39,17 @@ def generate_default_anchor_maps(anchors_setting=None, input_shape=INPUT_SIZE):
     if anchors_setting is None:
         anchors_setting = _default_anchors_setting
 
-    center_anchors = np.zeros((0, 4), dtype=np.float32)
-    edge_anchors = np.zeros((0, 4), dtype=np.float32)
-    anchor_areas = np.zeros((0,), dtype=np.float32)
-    input_shape = np.array(input_shape, dtype=int)
+    center_anchors  = np.zeros((0, 4), dtype=np.float32)
+    edge_anchors    = np.zeros((0, 4), dtype=np.float32)
+    anchor_areas    = np.zeros((0,), dtype=np.float32)
+    input_shape     = np.array(input_shape, dtype=int)
 
     for anchor_info in anchors_setting:
 
-        stride = anchor_info["stride"]
-        size = anchor_info["size"]
-        scales = anchor_info["scale"]
-        aspect_ratios = anchor_info["aspect_ratio"]
+        stride          = anchor_info["stride"]
+        size            = anchor_info["size"]
+        scales          = anchor_info["scale"]
+        aspect_ratios   = anchor_info["aspect_ratio"]
 
         output_map_shape = np.ceil(input_shape.astype(np.float32) / stride)
         output_map_shape = output_map_shape.astype(np.int)
@@ -62,6 +62,7 @@ def generate_default_anchor_maps(anchors_setting=None, input_shape=INPUT_SIZE):
         center_anchor_map_template = np.zeros(output_shape, dtype=np.float32)
         center_anchor_map_template[:, :, 0] = oy
         center_anchor_map_template[:, :, 1] = ox
+
         for scale in scales:
             for aspect_ratio in aspect_ratios:
                 center_anchor_map = center_anchor_map_template.copy()
@@ -75,16 +76,10 @@ def generate_default_anchor_maps(anchors_setting=None, input_shape=INPUT_SIZE):
                     ),
                     axis=-1,
                 )
-                anchor_area_map = center_anchor_map[..., 2] * center_anchor_map[..., 3]
-                center_anchors = np.concatenate(
-                    (center_anchors, center_anchor_map.reshape(-1, 4))
-                )
-                edge_anchors = np.concatenate(
-                    (edge_anchors, edge_anchor_map.reshape(-1, 4))
-                )
-                anchor_areas = np.concatenate(
-                    (anchor_areas, anchor_area_map.reshape(-1))
-                )
+                anchor_area_map     = center_anchor_map[..., 2] * center_anchor_map[..., 3]
+                center_anchors      = np.concatenate((center_anchors, center_anchor_map.reshape(-1, 4)))
+                edge_anchors        = np.concatenate((edge_anchors, edge_anchor_map.reshape(-1, 4)))
+                anchor_areas        = np.concatenate((anchor_areas, anchor_area_map.reshape(-1)))
 
     return center_anchors, edge_anchors, anchor_areas
 

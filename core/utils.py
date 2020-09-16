@@ -57,18 +57,19 @@ def progress_bar(current, total, msg=None):
 
 
 def format_time(seconds):
-    days = int(seconds / 3600 / 24)
-    seconds = seconds - days * 3600 * 24
-    hours = int(seconds / 3600)
-    seconds = seconds - hours * 3600
-    minutes = int(seconds / 60)
-    seconds = seconds - minutes * 60
-    secondsf = int(seconds)
-    seconds = seconds - secondsf
-    millis = int(seconds * 1000)
+    days        = int(seconds / 3600 / 24)
+    seconds     = seconds - days * 3600 * 24
+    hours       = int(seconds / 3600)
+    seconds     = seconds - hours * 3600
+    minutes     = int(seconds / 60)
+    seconds     = seconds - minutes * 60
+    secondsf    = int(seconds)
+    seconds     = seconds - secondsf
+    millis      = int(seconds * 1000)
 
     f = ""
     i = 1
+
     if days > 0:
         f += str(days) + "D"
         i += 1
@@ -90,13 +91,7 @@ def format_time(seconds):
 
 
 def init_log(output_dir):
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s %(message)s",
-        datefmt="%Y%m%d-%H:%M:%S",
-        filename=os.path.join(output_dir, "log.log"),
-        filemode="w",
-    )
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%Y%m%d-%H:%M:%S", filename=os.path.join(output_dir, "log.log"), filemode="w",)
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
     logging.getLogger("").addHandler(console)
