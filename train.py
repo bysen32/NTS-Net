@@ -20,10 +20,10 @@ _print = logging.info
 
 # read dataset
 trainset = dataset.CUB(root="./CUB_200_2011", is_train=True, data_len=None)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8, drop_last=False)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,  shuffle=True,   num_workers=8, drop_last=False)
 
 testset = dataset.CUB(root="./CUB_200_2011", is_train=False, data_len=None)
-testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False, num_workers=8, drop_last=False)
+testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE,    shuffle=False,  num_workers=8, drop_last=False)
 
 # define model
 net = model.attention_net(topN=PROPOSAL_NUM)
@@ -79,10 +79,9 @@ for epoch in range(start_epoch, 500):
                                             label.unsqueeze(1).repeat(1, PROPOSAL_NUM).view(-1),).view(batch_size, PROPOSAL_NUM)
 
         raw_loss        = creterion(raw_logits, label)
-        rank_loss       = model.ranking_loss(top_n_prob, part_loss)
         concat_loss     = creterion(concat_logits, label)
-        partcls_loss    = creterion(part_logits.view(batch_size * PROPOSAL_NUM, -1), 
-                                    label.unsqueeze(1).repeat(1, PROPOSAL_NUM).view(-1),)
+        rank_loss       = model.ranking_loss(top_n_prob, part_loss)
+        partcls_loss    = creterion(part_logits.view(batch_size * PROPOSAL_NUM, -1), label.unsqueeze(1).repeat(1, PROPOSAL_NUM).view(-1),)
 
         total_loss = raw_loss + rank_loss + concat_loss + partcls_loss
         total_loss.backward()

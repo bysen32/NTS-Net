@@ -109,11 +109,7 @@ def hard_nms(cdds, topn=10, iou_thresh=0.25):
         lengths = end_min - start_max
         intersec_map = lengths[:, 0] * lengths[:, 1]
         intersec_map[np.logical_or(lengths[:, 0] < 0, lengths[:, 1] < 0)] = 0
-        iou_map_cur = intersec_map / (
-            (res[:, 3] - res[:, 1]) * (res[:, 4] - res[:, 2])
-            + (cdd[3] - cdd[1]) * (cdd[4] - cdd[2])
-            - intersec_map
-        )
+        iou_map_cur = intersec_map / ((res[:, 3] - res[:, 1]) * (res[:, 4] - res[:, 2]) + (cdd[3] - cdd[1]) * (cdd[4] - cdd[2]) - intersec_map)
         res = res[iou_map_cur < iou_thresh]
 
     return np.array(cdd_results)
